@@ -1,21 +1,21 @@
 {
-  "Vue3.3+defineOptions快速生成模板": {
+  "Vue3.3+defineOptions模板": {
     "scope": "vue",
     "prefix": "Vue3",
     "body": [
       "<script setup lang=\"ts\">",
-      "defineOptions({",
-      "  name: \"\",",
-      "});",
+      "  defineOptions({",
+      "    name: \"\",",
+      "  });",
       "</script>",
       "",
       "<template>",
-      "  <div>${1:test}</div>",
+      "  <div>${1:}</div>",
       "</template>",
       "",
       "<style lang=\"scss\" scoped></style>",
       ""
     ],
-    "description": "Vue3.3+defineOptions快速生成模板"
+    "description": "Vue3.3+defineOptions模板"
   }
 }

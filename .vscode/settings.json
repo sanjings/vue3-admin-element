@@ -1,14 +1,21 @@
 {
+  "search.exclude": {
+    "**/node_modules": true,
+    "dist": true,
+    "build": true,
+    "package-lock.json": true,
+    "pnpm-lock.yaml": true,
+    "yarn.lock": true
+  },
   "editor.tabSize": 2,
   "editor.fontSize": 14,
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
-    "source.fixAll.volar": "explicit",
-    "source.fixAll.eslint": "explicit",
-    "source.fixAll.stylelint": "explicit"
+    "source.fixAll": "always",
+    "source.fixAll.volar": "always",
+    "source.fixAll.stylelint": "always"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "stylelint.enable": true,
@@ -34,7 +41,7 @@
     "editor.defaultFormatter": "stylelint.vscode-stylelint"
   },
   "[scss]": {
-    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
