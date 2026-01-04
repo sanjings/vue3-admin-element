@@ -1,7 +1,56 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    /** 指定 ECMAScript 目标版本，这里设置为最新版本 */
+    "target": "esnext",
+    /** 使用 define 声明类字段 */
+    "useDefineForClassFields": true,
+    /** 指定生成的模块代码 */
+    "module": "esnext",
+    /** 模块解析策略 */
+    "moduleResolution": "bundler",
+    /** TS 严格模式 */
+    "strict": true,
+    /** JSX 的处理方式 */
+    "jsx": "preserve",
+    /** 指定 JSX 工厂函数 */
+    "jsxFactory": "h",
+    /** 指定 JSX Fragment 工厂函数 */
+    "jsxFragmentFactory": "Fragment",
+    /** 指定 JSX 导入源 */
+    "jsxImportSource": "vue",
+    /** 从 tslib 导入辅助工具函数 */
+    "importHelpers": true,
+    /** 启用装饰器 */
+    "experimentalDecorators": true,
+    /** 允许从没有默认导出的模块中默认导入 */
+    "allowSyntheticDefaultImports": true,
+    /** 强制文件名大小写一致 */
+    "forceConsistentCasingInFileNames": true,
+    /** 生成源映射文件 */
+    "sourceMap": true,
+    /** 允许导入 JSON 模块 */
+    "resolveJsonModule": true,
+    /** 将每个文件作为单独的模块 */
+    "isolatedModules": true,
+    /** 启用 CommonJS 和 ES 模块之间的互操作性 */
+    "esModuleInterop": true,
+    /** 指定要包含的库文件 */
+    "lib": ["esnext", "dom"],
+    /** 跳过声明文件的类型检查 */
+    "skipLibCheck": true,
+    /** 要包含的类型声明文件 */
+    "types": ["node", "vite/client", "element-plus/global", "@amap/amap-jsapi-types"],
+    /** 基本URL，用于解析非相对模块名称 */
+    "baseUrl": ".",
+    /** 路径映射配置 */
+    "paths": {
+      "@/*": ["src/*"],
+      "types/*": ["types/*"]
+    }
+  },
+  /** 需要编译的文件 */
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "types/**/*.d.ts", "vite.config.ts"],
+  /** 编译器默认排除的编译文件 */
+  "exclude": ["node_modules", "dist", "build", "**/*.js", "src/services/yapi/*"]
 }

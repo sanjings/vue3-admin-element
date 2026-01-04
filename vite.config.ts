@@ -1,21 +1,11 @@
-import {
-  type ConfigEnv,
-  type UserConfigExport,
-  defineConfig,
-  loadEnv,
-} from "vite";
-import vue from "@vitejs/plugin-vue";
-import AutoImport from "unplugin-auto-import/vite";
-import Components from "unplugin-vue-components/vite";
-import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
-import { resolve } from "node:path";
-import {
-  name,
-  version,
-  engines,
-  dependencies,
-  devDependencies,
-} from "./package.json";
+import { type ConfigEnv, type UserConfigExport, defineConfig, loadEnv } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+import viteCompression from 'vite-plugin-compression';
+import { resolve } from 'node:path';
+import { name, version, engines, dependencies, devDependencies } from './package.json';
 
 const pathResolve = (dir: string) => resolve(__dirname, dir);
 
@@ -28,12 +18,23 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
     base: VITE_PUBLIC_PATH,
     resolve: {
       alias: {
-        "@": pathResolve("src"),
-        types: pathResolve("./types"),
-      },
+        '@': pathResolve('src'),
+        types: pathResolve('./types')
+      }
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler', // or 'modern', 'legacy'
+          additionalData: `
+            @use "@/styles/variables.scss" as *;
+            @use "@/styles/mixins.scss" as *;
+          `
+        }
+      }
     },
     server: {
-      host: "0.0.0.0", // 设置 host
+      host: '0.0.0.0', // 设置 host
       port: 5173, // 端口号
       hmr: true, // 热更新
       open: false, // 是否自动打开浏览器
@@ -41,24 +42,46 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       strictPort: false, // 端口被占用时，是否直接退出
       proxy: {
         [VITE_HTTP_BASE_URL]: {
-          target: "http://localhost:5173",
-          changeOrigin: true,
+          target: 'http://localhost:5173',
+          changeOrigin: true
           // rewrite: (path) => path.replace(/^\/${VITE_HTTP_BASE_URL}/, ""),
-        },
-      },
+        }
+      }
     },
     plugins: [
       vue(),
       AutoImport({
-        resolvers: [ElementPlusResolver()],
+        imports: ['vue', 'vue-router'], // 自动导入 Vue 相关函数，如：ref, reactive, toRef 等
+        resolvers: [
+          ElementPlusResolver({
+            importStyle: 'sass'
+          })
+        ],
+        vueTemplate: true,
+        // dts: false,
+        dts: 'types/auto-imports.d.ts'
       }),
       Components({
-        resolvers: [ElementPlusResolver()],
+        resolvers: [
+          ElementPlusResolver({
+            importStyle: 'sass'
+          })
+        ],
+        dirs: ['src/components'],
+        // dts: false,
+        dts: 'types/components.d.ts'
       }),
+      viteCompression({
+        verbose: true, // 是否显示压缩日志
+        disable: false, // 是否禁用压缩
+        threshold: 10240, // 大于10kb的文件gzip压缩
+        algorithm: 'gzip', // 压缩算法
+        ext: '.gz' // 压缩后的文件扩展名
+      })
     ],
     build: {
-      outDir: "dist",
-      assetsDir: "static", // 打包后静态资源目录
+      outDir: 'dist', // 打包后输出目录
+      assetsDir: 'static', // 打包后静态资源目录
       chunkSizeWarningLimit: 1024, // 单个 chunk 文件的大小超过 1024KB 时发出警告
       assetsInlineLimit: 4096, // 小于4kb base64转码
       reportCompressedSize: false, // 禁用 gzip 压缩大小报告
@@ -71,11 +94,11 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
            * 2. 如果你不想自定义 chunk 分割策略，可以直接移除这段配置
            */
           manualChunks: {
-            vue: ["vue", "vue-router", "pinia"],
-            element: ["element-plus", "@element-plus/icons-vue"],
-          },
-        },
-      },
+            vue: ['vue', 'vue-router', 'pinia'],
+            element: ['element-plus', '@element-plus/icons-vue']
+          }
+        }
+      }
     },
     define: {
       __APP_INFO__: {
@@ -84,8 +107,8 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
         engines,
         dependencies,
         devDependencies,
-        buildTime: Date.now(),
-      },
-    },
+        buildTime: Date.now()
+      }
+    }
   });
 };

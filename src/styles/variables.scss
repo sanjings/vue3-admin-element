@@ -1,0 +1,47 @@
+/* 颜色 ------------------------------------------  */
+$color-black: #111111;
+$color-gray: #a9aeb8;
+$color-blue: #004cff;
+$color-red: #f56c6c;
+$color-green: #00b578;
+$color-yellow: #e6a23c;
+$bg-color-gray: #f3f3f3;
+
+/* 边框 ------------------------------------------  */
+$border-color-gray-l: #e4e7ed;
+$border-color-gray-d: #d4d7de;
+
+/* 配置 ------------------------------------------  */
+$header-height: 40px; // 页头高度
+$sidebar-width: 200px; // 侧边栏宽度
+$sidebar-width-collapse: 64px; // 侧边栏收缩宽度
+$menu-bg: #304156;
+$menu-text: #cccccc;
+$menu-active-text: #ffffff;
+
+@forward "element-plus/theme-chalk/src/common/var.scss" with (
+  $colors: (
+    "black": $color-black,
+    "primary": (
+      "base": $color-blue,
+    ),
+    "success": (
+      "base": $color-green,
+    ),
+    "warning": (
+      "base": $color-yellow,
+    ),
+    "danger": (
+      "base": $color-red,
+    ),
+    "info": (
+      "base": $color-gray,
+    ),
+  ),
+  $text-color: (
+    "primary": $color-black,
+  ),
+  $bg-color: (
+    "page": $bg-color-gray,
+  )
+);
