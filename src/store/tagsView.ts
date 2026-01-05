@@ -1,7 +1,7 @@
-import { defineStore } from "pinia";
-import type { TagView } from "types/tagview";
+import { defineStore } from 'pinia';
+import type { TagView } from 'types/tagview';
 
-export const useTagsViewStore = defineStore("tagsView", () => {
+export const useTagsViewStore = defineStore('tagsView', () => {
   const affixViews = ref<TagView[]>([]);
   const visitedViews = ref<TagView[]>([]);
   const cachedViews = ref<string[]>([]);
@@ -14,7 +14,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
    */
   async function addVisitedView(view: TagView) {
     // 如果已经存在于已访问的视图列表中，则不再添加
-    if (visitedViews.value.some((v) => v.path === view.path)) return;
+    if (visitedViews.value.some((v: TagView) => v.path === view.path)) return;
     // 超出最大长度限制后，按先后顺序删除前面的
     if (visitedViews.value.length >= MAX_VIEWS) {
       await delLeftViews(visitedViews.value[affixViews.value.length + 1]);
@@ -73,7 +73,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
 
   function delOtherVisitedViews(view: TagView): Promise<TagView[]> {
     return new Promise((resolve) => {
-      visitedViews.value = visitedViews.value.filter((v) => {
+      visitedViews.value = visitedViews.value.filter((v: TagView) => {
         return v?.affix || v.path === view.path;
       });
       resolve([...visitedViews.value]);
@@ -95,11 +95,9 @@ export const useTagsViewStore = defineStore("tagsView", () => {
   }
 
   function updateVisitedView(view: TagView) {
-    for (let v of visitedViews.value) {
-      if (v.path === view.path) {
-        v = Object.assign(v, view);
-        break;
-      }
+    const index = visitedViews.value.findIndex((v: TagView) => v.path === view.path);
+    if (index > -1) {
+      visitedViews.value[index] = Object.assign({}, visitedViews.value[index], view);
     }
   }
 
@@ -108,41 +106,35 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     addCachedView(view);
   }
 
-  function delView(
-    view: TagView,
-  ): Promise<{ visitedViews: TagView[]; cachedViews: string[] }> {
+  function delView(view: TagView): Promise<{ visitedViews: TagView[]; cachedViews: string[] }> {
     return new Promise((resolve) => {
       delVisitedView(view);
       delCachedView(view);
       resolve({
         visitedViews: [...visitedViews.value],
-        cachedViews: [...cachedViews.value],
+        cachedViews: [...cachedViews.value]
       });
     });
   }
 
-  function delOtherViews(
-    view: TagView,
-  ): Promise<{ visitedViews: TagView[]; cachedViews: string[] }> {
+  function delOtherViews(view: TagView): Promise<{ visitedViews: TagView[]; cachedViews: string[] }> {
     return new Promise((resolve) => {
       delOtherVisitedViews(view);
       delOtherCachedViews(view);
       resolve({
         visitedViews: [...visitedViews.value],
-        cachedViews: [...cachedViews.value],
+        cachedViews: [...cachedViews.value]
       });
     });
   }
 
   function delLeftViews(view: TagView): Promise<{ visitedViews: TagView[] }> {
     return new Promise((resolve) => {
-      const currIndex = visitedViews.value.findIndex(
-        (v) => v.path === view.path,
-      );
+      const currIndex = visitedViews.value.findIndex((v: TagView) => v.path === view.path);
       if (currIndex === -1) {
         return;
       }
-      visitedViews.value = visitedViews.value.filter((item, index) => {
+      visitedViews.value = visitedViews.value.filter((item: TagView, index: number) => {
         if (index >= currIndex || item?.affix) {
           return true;
         }
@@ -154,26 +146,24 @@ export const useTagsViewStore = defineStore("tagsView", () => {
         return false;
       });
       resolve({
-        visitedViews: [...visitedViews.value],
+        visitedViews: [...visitedViews.value]
       });
     });
   }
 
   function delRightViews(view: TagView): Promise<{ visitedViews: TagView[] }> {
     return new Promise((resolve) => {
-      const currIndex = visitedViews.value.findIndex(
-        (v) => v.path === view.path,
-      );
+      const currIndex = visitedViews.value.findIndex((v: TagView) => v.path === view.path);
       if (currIndex === -1) {
         return;
       }
-      visitedViews.value = visitedViews.value.filter((item, index) => {
+      visitedViews.value = visitedViews.value.filter((item: TagView, index: number) => {
         if (index <= currIndex || item?.affix) {
           return true;
         }
       });
       resolve({
-        visitedViews: [...visitedViews.value],
+        visitedViews: [...visitedViews.value]
       });
     });
   }
@@ -183,19 +173,19 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     cachedViews: string[];
   }> {
     return new Promise((resolve) => {
-      const affixTags = visitedViews.value.filter((tag) => tag?.affix);
+      const affixTags = visitedViews.value.filter((tag: TagView) => tag?.affix);
       visitedViews.value = affixTags;
       cachedViews.value = [];
       resolve({
         visitedViews: [...visitedViews.value],
-        cachedViews: [...cachedViews.value],
+        cachedViews: [...cachedViews.value]
       });
     });
   }
 
   function delAllVisitedViews(): Promise<TagView[]> {
     return new Promise((resolve) => {
-      const affixTags = visitedViews.value.filter((tag) => tag?.affix);
+      const affixTags = visitedViews.value.filter((tag: TagView) => tag?.affix);
       visitedViews.value = affixTags;
       resolve([...visitedViews.value]);
     });
@@ -219,7 +209,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
       fullPath: $route.fullPath,
       affix: $route.meta?.affix,
       keepAlive: $route.meta?.keepAlive,
-      query: $route.query,
+      query: $route.query
     };
     delView(tags).then((res: any) => {
       if (isActive(tags)) {
@@ -237,7 +227,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     if (latestView && latestView.fullPath) {
       $router.push(latestView.fullPath);
     } else {
-      $router.push("/");
+      $router.push('/');
     }
   }
 
@@ -261,6 +251,6 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     delAllCachedViews,
     closeCurrentView,
     isActive,
-    toLastView,
+    toLastView
   };
 });

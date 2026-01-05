@@ -33,8 +33,8 @@
 
   watch(
     $route,
-    () => {
-      addTags();
+    async () => {
+      await addTags();
       moveToCurrentTag();
     },
     {
@@ -91,9 +91,9 @@
     return tags;
   };
 
-  function addTags() {
+  async function addTags() {
     if ($route.meta.title && !$route.meta.hideInTagview) {
-      tagsViewStore.addView({
+      await tagsViewStore.addView({
         name: String($route.name),
         title: $route.meta.title,
         path: $route.path,
@@ -105,9 +105,17 @@
     }
   }
 
+  /**
+   * 移动到当前标签并更新标签信息
+   * 使用 nextTick 确保：
+   * 1. addTags() 中的 addView 操作已完成
+   * 2. Vue 响应式更新已完成，visitedViews.value 已是最新状态
+   * 3. DOM 更新已完成，可以安全地读取和更新标签信息
+   */
   function moveToCurrentTag() {
     nextTick(() => {
       for (const tag of visitedViews.value) {
+        // 如果路径相同但 fullPath 不同（如 query 参数变化），更新标签信息
         if (tag.path === $route.path && tag.fullPath !== $route.fullPath) {
           tagsViewStore.updateVisitedView({
             name: String($route.name),

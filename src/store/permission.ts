@@ -1,7 +1,4 @@
-// import {
-// requestPermissionMenu,
-// type RequestPermissionMenuResponse,
-// } from "@/services/yapi";
+import { requestPermissionMenu, type RequestPermissionMenuResponse } from '@/services/api/user';
 import { defineStore } from 'pinia';
 import { type RouteRecordRaw } from 'vue-router';
 import { constantRoutes } from '@/router/routes';
@@ -23,10 +20,7 @@ type State = {
   perms: string[];
 };
 
-const transformRoutes = (
-  // routes: RequestPermissionMenuResponse,
-  routes: any
-): RouteRecordRaw[] => {
+const transformRoutes = (routes: RequestPermissionMenuResponse): RouteRecordRaw[] => {
   return routes.map((route) => {
     const tmpRoute: RouteRecordRaw = {
       path: route.redirect!,
@@ -59,11 +53,7 @@ const transformRoutes = (
   });
 };
 
-const transformPerms = (
-  // routes: RequestPermissionMenuResponse,
-  routes: any,
-  perms: string[]
-) => {
+const transformPerms = (routes: RequestPermissionMenuResponse, perms: string[]) => {
   routes.forEach((route) => {
     if (+route.type! === 2 && route.permission) {
       perms.push(route.permission);
@@ -111,12 +101,7 @@ export const usePermissionStore = defineStore<
   },
   actions: {
     async generatePermission() {
-      // const res = await requestPermissionMenu();
-      const res = {
-        code: 200,
-        data: [],
-        message: 'success'
-      };
+      const res = await requestPermissionMenu();
       if (res.code === 200) {
         this.dynamicRoutes = transformRoutes(res.data || []);
         transformPerms(res.data || [], this.perms);

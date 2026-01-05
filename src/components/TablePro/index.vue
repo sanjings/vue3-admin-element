@@ -81,11 +81,25 @@
   const pageRef = useTemplateRef<HTMLElement>('page');
   const tableRef = useTemplateRef<InstanceType<typeof ElTable>>('table');
   const searchFormRef = useTemplateRef<FormInstance>('searchForm');
+  // 窗口宽度响应式处理
+  const windowWidth = ref(window.innerWidth);
+  const updateWindowWidth = () => {
+    windowWidth.value = window.innerWidth;
+  };
+
+  onMounted(() => {
+    window.addEventListener('resize', updateWindowWidth);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateWindowWidth);
+  });
+
   const searchcolnum = computed(
     () =>
       searchConfig?.col ||
       Math.round(
-        (pageRef.value?.offsetWidth || Number(window.innerWidth - parseFloat(variables['sidebar-width']))) / 445
+        (pageRef.value?.offsetWidth || Number(windowWidth.value - parseFloat(variables['sidebar-width']))) / 445
       ) ||
       4
   );
@@ -104,7 +118,9 @@
 
   onMounted(() => {
     _initQueryParams();
-    requests.immediately && handleSearch();
+    if (requests.immediately) {
+      handleSearch();
+    }
   });
 
   /**
@@ -113,9 +129,14 @@
   const _initQueryParams = () => {
     queryParams.value = cloneDeep(requests.params);
     searchConfig.formItems?.forEach?.((item) => {
-      queryParams.value[item.prop!] = cloneDeep(item.initialValue);
-      if (item.initialValue != undefined) {
-        item.transform?.(item.initialValue, queryParams.value);
+      const initialValue = item.initialValue;
+      // 只有对象和数组才需要深拷贝
+      if (initialValue != undefined) {
+        queryParams.value[item.prop!] =
+          Array.isArray(initialValue) || (typeof initialValue === 'object' && initialValue !== null)
+            ? cloneDeep(initialValue)
+            : initialValue;
+        item.transform?.(initialValue, queryParams.value);
       } else if (item.type === 'number-range' || item.type === 'select-text') {
         queryParams.value[item.prop!] = [];
       }
@@ -140,10 +161,15 @@
    * 查询第一页
    */
   const handleSearch = async () => {
-    await searchFormRef.value?.validate();
-    pageParams.page = 1;
-    refresh();
-    $emit('onClickSearch', { ...queryParams.value });
+    try {
+      await searchFormRef.value?.validate();
+      pageParams.page = 1;
+      refresh();
+      $emit('onClickSearch', { ...queryParams.value });
+    } catch (error) {
+      // 表单验证失败，不执行查询
+      console.warn('表单验证失败:', error);
+    }
   };
 
   /**
@@ -211,6 +237,7 @@
       loading.value = true;
       const requestFn = requests?.method?.toLowerCase?.() === 'get' ? requestGet : requestPost;
       const res = await requestFn<PageListResponse<Recordable>>(requests.baseUrl + requests.url!, { body: params });
+
       if (res.code === 200) {
         tableData.value = Array.isArray(res.data) ? res.data : res.data?.list || [];
         tableTotal.value = Array.isArray(res.data) ? res.data.length : Number(res.data?.count) || 0;
@@ -219,12 +246,17 @@
         $emit('onRequestError', res);
         tableData.value = [];
         tableTotal.value = 0;
-        ElMessage.error(res.message);
+        ElMessage.error(res.message || '请求失败');
       }
-    } catch (error) {
+    } catch (error: any) {
+      // util.ts 中的 handleError 已经处理了取消请求的情况
       $emit('onRequestError', error);
+      tableData.value = [];
+      tableTotal.value = 0;
+      ElMessage.error(error?.message || '请求失败');
+    } finally {
+      loading.value = false;
     }
-    loading.value = false;
   };
 
   /**
