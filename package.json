@@ -14,7 +14,7 @@
     "prettier": "prettier \"**/*.{vue,js,cjs,jsx,ts,tsx,json,css,less,scss,html,md}\" --write",
     "format": "npm run prettier && npm run stylelint",
     "lint-staged": "lint-staged",
-    "tsc": "vue-tsc --noEmit",
+    "ts-check": "vue-tsc --noEmit",
     "prepare": "husky",
     "ytt": "npx ytt"
   },
